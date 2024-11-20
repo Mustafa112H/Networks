@@ -132,8 +132,9 @@ strong {
 
 /* Heading in the footer */
 .header-3 {
-    font-size: 1.2em;
+    font-size: 1.5sem;
     margin-bottom: 10px;
+    color: navy
 }
 
 /* Styling for links */
@@ -144,4 +145,8 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+ul {
+    margin-top: 10px;
+    margin-bottom: 20px; 
 }
