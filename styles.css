@@ -93,6 +93,13 @@ strong {
 .container-picture {
     text-align: center;
     margin: 20px;
+    display: inline-block; /* This makes the container shrink to fit the image */
+}
+
+.container-picture .image {
+    border: 5px solid #CC7722;  /* Adds a navy border around the image */
+    width: 100%;  /* Optional: Makes the image responsive */
+    max-width: 900px; /* Optional: Restricts the maximum width of the image */
 }
 
 .image {
