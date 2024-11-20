@@ -16,7 +16,9 @@ header {
 }
 
 h1 {
-    color: white} 
+    color: white;
+} 
+
 h2 {
     color: navy; /* Ensure the text color is visible */
 }
@@ -84,4 +86,62 @@ h2 {
 /* Strong text styling for labels */
 strong {
     color: navy;
+}
+
+/* Styling for the second section */
+.container-picture {
+    text-align: center;
+    margin: 20px;
+}
+
+.image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.paragraph {
+    text-align: justify;
+    margin-top: 20px;
+    padding: 0 20px;
+}
+
+/* Styling for ordered and unordered lists */
+.ordered-list {
+    font-weight: bold;
+}
+
+.unordered-list {
+    margin-left: 20px;
+}
+
+/* Footer styling */
+.footer {
+    background-color: #f1f1f1;
+    padding: 20px;
+    text-align: left; /* Align text to the left */
+    margin-top: 40px;
+}
+
+/* Links in the footer */
+.links-footer {
+    text-align: left;  /* Align the links to the left */
+    margin-left: 40px;  /* Add margin from the left side of the page */
+    max-width: 800px;
+}
+
+/* Heading in the footer */
+.header-3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+/* Styling for links */
+a {
+    color: navy;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }
