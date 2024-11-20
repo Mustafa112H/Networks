@@ -158,16 +158,12 @@ a {
 
 a:hover {
     text-decoration: underline;
-<<<<<<< HEAD
 }
 ul {
     margin-top: 10px;
     margin-bottom: 20px; 
-||||||| b75684d
-=======
 }
 
 li{
     line-height: 1.5;
->>>>>>> f80dd5851f5704e40a57543c7246305382cf9db6
 }
