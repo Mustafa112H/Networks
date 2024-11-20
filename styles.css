@@ -5,6 +5,7 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
+    line-height: 1.5;
 }
 
 /* Header styling */
@@ -112,6 +113,7 @@ strong {
     text-align: justify;
     margin-top: 20px;
     padding: 0 20px;
+    line-height: 1.5;
 }
 
 /* Styling for ordered and unordered lists */
@@ -156,8 +158,16 @@ a {
 
 a:hover {
     text-decoration: underline;
+<<<<<<< HEAD
 }
 ul {
     margin-top: 10px;
     margin-bottom: 20px; 
+||||||| b75684d
+=======
+}
+
+li{
+    line-height: 1.5;
+>>>>>>> f80dd5851f5704e40a57543c7246305382cf9db6
 }
