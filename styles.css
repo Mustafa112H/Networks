@@ -21,6 +21,7 @@ h1 {
 
 h2 {
     color: navy; /* Ensure the text color is visible */
+    text-decoration: underline;
 }
 
 /* Move "Team Members" heading slightly to the right */
@@ -109,6 +110,7 @@ strong {
 /* Styling for ordered and unordered lists */
 .ordered-list {
     font-weight: bold;
+    color: #CC7722
 }
 
 .unordered-list {
@@ -117,7 +119,7 @@ strong {
 
 /* Footer styling */
 .footer {
-    background-color: #f1f1f1;
+    background-color: navy;
     padding: 20px;
     text-align: left; /* Align text to the left */
     margin-top: 40px;
@@ -132,14 +134,16 @@ strong {
 
 /* Heading in the footer */
 .header-3 {
-    font-size: 1.5sem;
+    font-size: 1.5em;
     margin-bottom: 10px;
-    color: navy
+    color: #C3E3EB;
+    text-decoration: underline;
+
 }
 
 /* Styling for links */
 a {
-    color: navy;
+    color: white;
     text-decoration: none;
 }
 
