@@ -136,8 +136,14 @@ strong {
 }
 
 /* Links in the footer */
-.links-footer {
-    text-align: left;  /* Align the links to the left */
+.links-footer-en {
+    text-align:left;  /* Align the links to the left */
+    margin-left: 40px;  /* Add margin from the left side of the page */
+    max-width: 800px;
+}
+
+.links-footer-ar {
+    text-align:right;  /* Align the links to the left */
     margin-left: 40px;  /* Add margin from the left side of the page */
     max-width: 800px;
 }
