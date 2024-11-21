@@ -82,15 +82,26 @@ button:hover {
 }
 
 /* Footer styling */
-.footer {
+.footer_en {
     background-color: navy;
     padding: 20px;
     text-align: left;
     margin-top: 40px;
 }
+.footer_ar {
+    background-color: navy;
+    padding: 20px;
+    text-align: right;
+    margin-top: 40px;
+}
 
 .links-footer-en {
     text-align: left;
+    margin-left: 40px;
+    max-width: 800px;
+}
+.links-footer-ar {
+    text-align: right;
     margin-left: 40px;
     max-width: 800px;
 }
@@ -103,3 +114,12 @@ button:hover {
 .links-footer-en a:hover {
     text-decoration: underline;
 }
+.links-footer-ar a {
+    color: white;
+    text-decoration: none;
+}
+
+.links-footer-ar a:hover {
+    text-decoration: underline;
+}
+
