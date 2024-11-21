@@ -23,6 +23,7 @@ h1 {
 h2 {
     color: navy; /* Ensure the text color is visible */
     text-decoration: underline;
+    margin-right: 20px;
 }
 
 /* Move "Team Members" heading slightly to the right */
@@ -135,8 +136,14 @@ strong {
 }
 
 /* Links in the footer */
-.links-footer {
-    text-align: left;  /* Align the links to the left */
+.links-footer-en {
+    text-align:left;  /* Align the links to the left */
+    margin-left: 40px;  /* Add margin from the left side of the page */
+    max-width: 800px;
+}
+
+.links-footer-ar {
+    text-align:right;  /* Align the links to the left */
     margin-left: 40px;  /* Add margin from the left side of the page */
     max-width: 800px;
 }

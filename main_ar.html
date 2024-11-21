@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>ENCS3320-Webserver</title>
+</head>
+
+<!-- the top of the webpage -->
+
+<body>
+    <header>
+        <h1>مرحباً بكم في مساق ENCS3320: شبكات الحاسوب</h1>
+    </header>
+
+    <section>
+        <h2>أعضاء الفريق</h2>
+
+        <!-- Flexbox container for team member boxes -->
+        <div class="team-member-container">
+            <!-- Team Member 1 -->
+            <div class="team-member-box">
+                <div class="team-member">
+                    <div class="team-member-photo">
+                        <img src="HebaMustafa.png" alt="Heba Mustafa">
+                    </div>
+                    <div class="team-member-info">
+                        <p><strong>الاسم: </strong>هبة مصطفى</p>
+                        <p><strong>الرقم الجامعي: </strong>1221916</p>
+                    </div>
+                    <div class="team-member-description">
+                        <p><strong>الوصف: </strong>هبة مهندسة كمبيوتر طموحة ولديها شغف الذكاء الاصطناعي و
+                          التعلم الآلي وهندسة الكمبيوتر. تتقن بايثون ، C ، جافا ، HTML ، و CSS ،
+                          تجمع بين الإبداع وحل المشكلات في كل مشروع. في أوقات فراغها ، تستمتع
+                          لعب تنس الطاولة. حريصة دائما على التعلم والنمو في مجال التكنولوجيا.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 2 -->
+            <div class="team-member-box">
+                <div class="team-member">
+                    <div class="team-member-photo">
+                        <img src="MaysamHabbash.png" alt="Maysam Habbash">
+                    </div>
+                    <div class="team-member-info">
+                        <p><strong>الاسم: </strong>ميسم هباش</p>
+                        <p><strong>الرقم الجامعي: </strong>1220075</p>
+                    </div>
+                    <div class="team-member-description">
+                        <p><strong>الوصف: </strong>ميسم طالبة هندسة حاسوب ذكية
+                          مع شغف عميق بالأجهزة وكل ما يتعلق بالتكنولوجيا. إنها بارعة في جافا ، سي ، بايثون ،
+                          والبرمجة النصية شل و تسعى دائماً لإتقان العمل الموكل إليها. خارج دراستها ، تستمتع بلعب تنس الطاولة و
+                          كرة السلة.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="header-2"><strong>أنواع التأخير في شبكات تبديل الرزم:</strong></h2>
+
+        <div class="container-picture">
+            <img src="nodal_delay_at_router.JPG" alt="Nodal delay at a router" class="image">
+            <figcaption><i>المصدر: كوروز، ج. & روس، ك. (2017). شبكات الحاسوب: منهج من الأعلى إلى الأسفل، الطبعة الثامنة. بيرسون.</i></figcaption>
+            <p class="paragraph">
+              الصورة توضح مكونات التأخير العقدي في شبكة تبديل الرزم أثناء انتقال الحزمة عبر الموجه A إلى وجهتها.
+              تبدأ العملية بمعالجة الحزمة في العقدة، حيث يقوم الموجه بفحص رأس الحزمة،
+               واتخاذ قرارات التوجيه، والتأكد من الأخطاء. يلي ذلك تأخير الاصطفاف (Queueing Delay)، الذي يحدث إذا كان الرابط الخارج مشغولاً، مما يؤدي إلى انتظار الحزم في طابور؛ وتعتمد مدة هذا التأخير على ازدحام الشبكة وعدد الحزم المنتظرة مسبقاً.
+                بعد ذلك، يحدث تأخير الإرسال (Transmission Delay)،
+                عندما يرسل الموجه الحزمة إلى الرابط، وهو تأخير يعتمد على حجم الحزمة وعرض نطاق الرابط. وأخيراً، يحدث تأخير الانتشار (Propagation Delay)،
+                وهو الوقت الذي تستغرقه الحزمة للانتقال عبر الرابط المادي إلى العقدة التالية، 
+              ويعتمد ذلك على المسافة بين العقد وسرعة انتشار الإشارة في الوسط المستخدم.
+            </p>
+        </div>
+
+
+        <!-- Ordered list -->
+        <div>
+            <ol start="1">
+                <li class="ordered-list">تأخير المعالجة (Processing Delay):</li>
+                <!-- Unordered list -->
+                <ul>
+                    <li class="unordered-list">الوقت الذي يستغرقه الموجه لفحص رأس الحزمة وتحديد مسار توجيهها.</li>
+                    <li class="unordered-list">يتضمن التحقق من الأخطاء واتخاذ قرارات التوجيه.</li>
+                    <li class="unordered-list">عادةً ما يكون في حدود الميكروثانية.</li>
+                </ul>
+                <li class="ordered-list">تأخير الاصطفاف (Queuing Delay):</li>
+                <ul>
+                    <li class="unordered-list">يحدث عندما تنتظر الحزمة في طابور من أجل الإرسال.</li>
+                    <li class="unordered-list">تعتمد المدة على ازدحام الشبكة الحالي وعدد الحزم الموجودة بالفعل في الطابور.</li>
+                    <li class="unordered-list">يمكن أن يتراوح التأخير بين كونه ضئيلاً أو كبيراً، بناءً على حجم حركة المرور.</li>
+                </ul>
+                <li class="ordered-list">تأخير الإرسال (Transmission Delay):</li>
+                <ul>
+                    <li class="unordered-list">الوقت المطلوب لإرسال جميع بتات الحزمة إلى رابط النقل.</li>
+                    <li class="unordered-list">يعتمد على حجم الحزمة وعرض النطاق الترددي للرابط.</li>
+                    <li class="unordered-list">يُحسب كالتالي: حجم الحزمة / عرض النطاق الترددي للرابط.</li>
+                </ul>
+                <li class="ordered-list">تأخير الانتشار (Propagation Delay):</li>
+                <ul>
+                    <li class="unordered-list">الوقت الذي تستغرقه الحزمة للانتقال من أحد طرفي الرابط إلى الطرف الآخر.</li>
+                    <li class="unordered-list">يُحدد بواسطة المسافة بين الموجهات وسرعة انتشار الإشارة في الوسط الناقل.</li>
+                </ul>
+            </ol>
+            <p class="paragraph">للمزيد من المعلومات حول مفاهيم الشبكات، يمكن الرجوع إلى كتاب:
+              Computer Networking: A Top-Down Approach
+              بقلم جيمس كوروز (James Kurose) وكيث روس (Keith Ross).</p>
+        </div>
+
+        <!-- Footer providing links -->
+        <footer class="footer">
+            <div class="links-footer-ar">
+                <h3 class="header-3">شريط التنقل:</h3>
+                <p><a href="supporting_material_en.html">صفحة المواد المساندة</a></p>
+                <p><a href="https://gaia.cs.umass.edu/kurose_ross/index.php">موقع الكتاب الدراسي</a></p>
+                <p><a href="https://ritaj.birzeit.edu/">موقع ريتاج</a></p>
+            </div>
+        </footer>
+    </section>
+
+</body>
+
+</html>
