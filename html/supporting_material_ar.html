@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المواد الداعمة</title>
+    <link rel="stylesheet" href="../css/style_support.css">
+</head>
+<body>
+    <div class="content-wrapper">
+        <header>
+            <h1>طلب المواد الداعمة</h1>
+        </header>
+
+        <section class="container-picture">
+            <h2>طلب ملف</h2>
+            <p>أدخل اسم الملف (مثل image.png أو video.mp4) واضغط على "طلب" للحصول على المادة المقابلة.</p>
+
+            <form action="/request_material" method="get" class="request-form">
+                <label for="file">اسم الملف:</label>
+                <input type="text" id="file" name="file" required placeholder="أدخل اسم الملف هنا">
+                <button type="submit">طلب</button>
+            </form>
+        </section>
+
+        <footer class="footer">
+            <div class="links-footer-ar">
+                <p><a href="../html/main_ar.html">العودة إلى الصفحة الرئيسية</a></p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

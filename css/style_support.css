@@ -1,0 +1,105 @@
+/* General page settings */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;  /* Full viewport height to center content vertically */
+}
+
+.content-wrapper {
+    width: 100%;
+    max-width: 900px;  /* Ensures the content does not stretch too wide */
+    background-color: white;
+    border: 5px solid #CC7722;  /* Adds the border around the entire content */
+    border-radius: 8px;  /* Optional: Adds rounded corners */
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+header {
+    background-color: navy;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    color: white;
+}
+
+/* Section styling */
+.container-picture {
+    text-align: center;
+    margin: 20px;
+    display: inline-block;
+}
+
+h2 {
+    color: navy;
+    text-decoration: underline;
+    padding-left: 20px;
+}
+
+.request-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+label {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+input[type="text"] {
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #CC7722;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #CC7722;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+button:hover {
+    background-color: #a15d1b;  /* Darker shade on hover */
+}
+
+/* Footer styling */
+.footer {
+    background-color: navy;
+    padding: 20px;
+    text-align: left;
+    margin-top: 40px;
+}
+
+.links-footer-en {
+    text-align: left;
+    margin-left: 40px;
+    max-width: 800px;
+}
+
+.links-footer-en a {
+    color: white;
+    text-decoration: none;
+}
+
+.links-footer-en a:hover {
+    text-decoration: underline;
+}
