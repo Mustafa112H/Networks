@@ -2,22 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supporting Material</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Request Networking Topic Resources</h1>
-    <form action="/supporting_material" method="get">
-        <label for="file_request">Enter a Networking Topic (e.g., HTTP Protocol):</label><br>
-        <input type="text" id="file_request" name="file_request" required>
-        <br><br>
-        <label for="file_type">Select File Type:</label><br>
-        <input type="radio" id="image" name="file_type" value="image" required>
-        <label for="image">Image</label><br>
-        <input type="radio" id="video" name="file_type" value="video" required>
-        <label for="video">Video</label><br><br>
-        <input type="submit" value="Search">
+    <h1>Request Supporting Material</h1>
+    <form action="/request_material" method="get">
+        <label for="file">Enter the name of the file (e.g., image.png or video.mp4):</label>
+        <input type="text" id="file" name="file" required>
+        <button type="submit">Request</button>
     </form>
 </body>
 </html>
