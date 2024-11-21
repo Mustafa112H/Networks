@@ -1,5 +1,11 @@
 import socket
 
+# Basic server setup
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind(("", 5689))  # Bind to port 5689
+server_socket.listen(5)  # Listen for up to 5 connections
+print("Server is listening on port 5689...")
+
 # Function to determine MIME type
 def get_mime_type(filename):
     if filename.endswith(".html"):
@@ -41,48 +47,37 @@ def serve_file(path, client_address):
     except FileNotFoundError:
         # Return 404 if the file is not found
         error_message = f"""
-        <html><body>
+        <html><head><title>Error 404</title></head><body>
         <h1>Error 404</h1>
         <p style='color: red;'>The file is not found</p>
         <p>Client IP: {client_address[0]}, Port: {client_address[1]}</p>
         </body></html>
         """
-        response = f"HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n{error_message}"
+        status_line = "HTTP/1.1 404 Not Found\r\n"
+        headers = "Content-Type: text/html\r\n\r\n"
+        response = status_line + headers + error_message
         return response.encode()
 
-# Basic server setup
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(("", 5689))  # Bind to port 5689
-server_socket.listen(5)  # Listen for up to 5 connections
-print("Server is listening on port 5689...")
-
-# Main server loop
+# Accept client connections and serve files
 while True:
-    client_connection, client_address = server_socket.accept()
-    request = client_connection.recv(1024).decode()
-
+    client_socket, client_address = server_socket.accept()
+    print(f"Connection from {client_address}")
+    
+    # Receive the HTTP request (assuming a simple GET request)
+    request = client_socket.recv(1024).decode()
+    
+    # Extract the file path from the request
     if request:
-        print(f"Request from {client_address}:\n{request}")  # Log request for debugging
+        request_line = request.splitlines()[0]
+        requested_path = request_line.split(" ")[1]
+        
+        # Serve the file (or handle error if not found)
+        response = serve_file(requested_path, client_address)
+        
+        # Send the response to the client
+        client_socket.sendall(response)
+    
+    # Close the client socket after handling the request
+    client_socket.close()
 
-        # Parse the request
-        try:
-            request_line = request.split("\r\n")[0]
-            method, path, _ = request_line.split(" ")
 
-            # Handle GET requests
-            if method == "GET":
-                response = serve_file(path, client_address)
-            else:
-                # Method not allowed
-                response = (f"HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html\r\n\r\n"
-                            f"<html><body><h1>405 Method Not Allowed</h1></body></html>").encode()
-
-        except Exception as e:
-            # Internal server error
-            response = (f"HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                        f"<html><body><h1>500 Internal Server Error</h1>"
-                        f"<p>{e}</p></body></html>").encode()
-
-        client_connection.sendall(response)
-
-    client_connection.close()
