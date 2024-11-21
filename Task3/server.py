@@ -1,4 +1,5 @@
 from socket import *
+from questions import *
 
 # Port on which the server listens
 serverPort = 6250
@@ -22,6 +23,9 @@ def broadcast_players(name):
   message = f"{name} has joined the game!\n Current number of players: {len(activeClients)}"
   for client in activeClients:
     serverSocket.sendto(message.encode(), client)
+
+def selectQuestions():
+  
 
 # Function to start the game
 def startGame():
