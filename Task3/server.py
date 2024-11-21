@@ -1,7 +1,7 @@
 from socket import *
 
 # Port on which the server listens
-serverPort = 6000
+serverPort = 6008
 hostName = gethostname()
 serverIP = gethostbyname(hostName)
 
@@ -23,16 +23,28 @@ def broadcast_players(name):
   for client in activeClients:
     serverSocket.sendto(message.encode(), client)
 
+# Function to start the game
+def startGame():
+  print("Starting the Trivia Game  Round in 90 seconds!")
+  # broadcasting a welcome message to notify clients that the round is about to start
+  startingMessage = "Starting the Trivia Game  Round in 90 seconds! Get ready!"
+  for client in activeClients:
+    serverSocket.sendto(startingMessage.encode(), client)
+
 while (True):
-  # while (len(activeClients) < 2):
+  # Check minimum number of players
+  # if (len(activeClients) < 2):
   #   print("Waiting for at least 2 clients to join the game . . .")
+  # else:
+  #   startGame()
+
   clientName, clientIP = serverSocket.recvfrom(2048)
   # list client as active
   if clientIP not in activeClients:
     activeClients.append(clientIP)
+
     print(f"{clientName.decode()} joined the game from {clientIP}")
-    welcomingMessage = f"Registered with Trivia Game server at IP {serverIP}, Port {serverPort}\n"
-    if (len(activeClients) < 2):
-      welcomingMessage += "Wainting for the game to start . . ."
+    welcomingMessage = f"Registered with Trivia Game server at IP {serverIP}, Port {serverPort}\nWainting for the game to start . . ."
+
     serverSocket.sendto(welcomingMessage.encode(), clientIP)
     broadcast_players(clientName.decode())

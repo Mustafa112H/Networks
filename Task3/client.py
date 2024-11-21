@@ -8,18 +8,17 @@ serverIP = input('Enter the server IP address: ')
 serverPort = int(input('Enter the server port number: '))
 clientName = input('Enter your name: ')
 
+
 # Connection with server
-def connectWithServer():
+def connectWithServer(serverIP, serverPort):
   clientSocket.sendto(clientName.encode(), (serverIP, serverPort))
-  # Receive massages from server
-  welcomingMessage, serverIP = clientSocket.recvfrom(2048)
-  gameStatus, serverIP = clientSocket.recvfrom(2048)
 
-  print()
-  print(welcomingMessage.decode())
-  print()
-  print(gameStatus.decode())
+  while (True):
+    # Receive and print massages from server
+    message, serverIP = clientSocket.recvfrom(2048)
+    print()
+    print(message.decode())
+    
+connectWithServer(serverIP, serverPort)
 
-connectWithServer()
-
-clientSocket.close()
+# clientSocket.close()
