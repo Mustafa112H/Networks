@@ -23,6 +23,7 @@ h1 {
 h2 {
     color: navy; /* Ensure the text color is visible */
     text-decoration: underline;
+    margin-right: 20px;
 }
 
 /* Move "Team Members" heading slightly to the right */
