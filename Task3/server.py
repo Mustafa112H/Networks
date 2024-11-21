@@ -1,78 +1,38 @@
-import socket
-import random
-import time
-from threading import Thread
+from socket import *
 
-# Constants
-SERVER_IP = '127.0.0.1'
-SERVER_PORT = 5689
-MIN_CLIENTS = 2
-QUESTION_TIME = 90  # seconds
-PREPARE_TIME = 60  # seconds
-NUM_QUESTIONS = 3
+# Port on which the server listens
+serverPort = 6000
+hostName = gethostname()
+serverIP = gethostbyname(hostName)
 
-# Sample questions and answers (a dictionary for simplicity)
-QUESTIONS = [
-    ("What is the capital of France?", "Paris"),
-    ("Who wrote 'Hamlet'?", "Shakespeare"),
-    ("What is the largest ocean?", "Pacific"),
-    ("Who discovered America?", "Columbus")
-]
+# UDP socket creation
+serverSocket = socket(AF_INET, SOCK_DGRAM)
 
-# Game state
-clients = {}
-scores = {}
+# Binding host address and port number
+serverSocket.bind((serverIP, serverPort))
 
-# UDP server setup
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.bind((SERVER_IP, SERVER_PORT))
+# serverSocket.listen(3)
+print(f"Trivia Game server started and listening on ({serverIP}, {serverPort})\n")
 
-def broadcast_message(message):
-    for client in clients:
-        server_socket.sendto(message.encode(), client)
+# List of active clients on the server
+activeClients = []
 
-def handle_client(client_address, message):
-    print(f"Received message from {client_address}: {message}")
-    # Add logic to handle answers and other messages
+# Function to broadcast players in the game
+def broadcast_players(name):
+  message = f"{name} has joined the game!\n Current number of players: {len(activeClients)}"
+  for client in activeClients:
+    serverSocket.sendto(message.encode(), client)
 
-def start_round():
-    if len(clients) >= MIN_CLIENTS:
-        print("Starting round with enough players...")
-        broadcast_message("Round is starting!")
-        for i in range(NUM_QUESTIONS):
-            question, correct_answer = random.choice(QUESTIONS)
-            broadcast_message(f"Question {i+1}: {question}")
-            time.sleep(PREPARE_TIME)
-            start_time = time.time()
-
-            while time.time() - start_time < QUESTION_TIME:
-                # Wait for answers
-                pass
-            
-            # Evaluate answers
-            # Broadcast correct answer and scores
-            broadcast_message(f"The correct answer was: {correct_answer}")
-            time.sleep(5)  # Pause between questions
-        # End of round, announce winner
-        announce_winner()
-
-def announce_winner():
-    winner = max(scores, key=scores.get)
-    print(f"The winner of this round is {winner}!")
-    broadcast_message(f"The winner is {winner}! Well done.")
-
-def server_loop():
-    print(f"Server listening on {SERVER_IP}:{SERVER_PORT}")
-    while True:
-        message, client_address = server_socket.recvfrom(1024)
-        if client_address not in clients:
-            clients[client_address] = "Player " + str(len(clients)+1)
-            scores[client_address] = 0
-            print(f"New client connected: {client_address}")
-        
-        handle_client(client_address, message.decode())
-
-if __name__ == "__main__":
-    round_thread = Thread(target=start_round)
-    round_thread.start()
-    server_loop()
+while (True):
+  # while (len(activeClients) < 2):
+  #   print("Waiting for at least 2 clients to join the game . . .")
+  clientName, clientIP = serverSocket.recvfrom(2048)
+  # list client as active
+  if clientIP not in activeClients:
+    activeClients.append(clientIP)
+    print(f"{clientName.decode()} joined the game from {clientIP}")
+    welcomingMessage = f"Registered with Trivia Game server at IP {serverIP}, Port {serverPort}\n"
+    if (len(activeClients) < 2):
+      welcomingMessage += "Wainting for the game to start . . ."
+    serverSocket.sendto(welcomingMessage.encode(), clientIP)
+    broadcast_players(clientName.decode())

@@ -1,43 +1,25 @@
-import socket
-import time
-from threading import Thread
+from socket import *
 
-# Constants
-SERVER_IP = '127.0.0.1'
-SERVER_PORT = 5689
-USERNAME = "Player 1"
+# UDP client socket creation
+clientSocket =socket(AF_INET, SOCK_DGRAM)
 
-# UDP client setup
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# Prompting the user to enter server info for connection
+serverIP = input('Enter the server IP address: ')
+serverPort = int(input('Enter the server port number: '))
+clientName = input('Enter your name: ')
 
-def send_message(message):
-    try:
-        client_socket.sendto(message.encode(), (SERVER_IP, SERVER_PORT))
-    except Exception as e:
-        print(f"Error sending message: {e}")
+# Connection with server
+def connectWithServer():
+  clientSocket.sendto(clientName.encode(), (serverIP, serverPort))
+  # Receive massages from server
+  welcomingMessage, serverIP = clientSocket.recvfrom(2048)
+  gameStatus, serverIP = clientSocket.recvfrom(2048)
 
-def receive_message():
-    while True:
-        try:
-            message, server_address = client_socket.recvfrom(1024)
-            print(f"Received message: {message.decode()} from {server_address}")
-        except OSError as e:
-            print(f"Error receiving message: {e}")
-            break
+  print()
+  print(welcomingMessage.decode())
+  print()
+  print(gameStatus.decode())
 
-def game_loop():
-    print(f"Connected to server at {SERVER_IP}:{SERVER_PORT}")
-    send_message(USERNAME)
-    
-    # Game loop
-    while True:
-        # Listening for game messages (questions, scores, etc.)
-        time.sleep(1)
+connectWithServer()
 
-if __name__ == "__main__":
-    # Start the message receiving thread
-    receive_thread = Thread(target=receive_message)
-    receive_thread.start()
-    
-    # Start the game loop
-    game_loop()
+clientSocket.close()
