@@ -4,7 +4,7 @@ import random
 import time
 
 # Port on which the server listens
-serverPort = 8000
+serverPort = 9000
 hostName = gethostname()
 serverIP = gethostbyname(hostName)
 
@@ -51,10 +51,11 @@ def selectQuestions():
 # Function to start the game
 def startGame():
   print("Starting the Trivia Game Round in 90 seconds!")
-  time.sleep(90)
 
   # broadcasting a welcome message to notify clients that the round is about to start
   startingMessage = "Starting the Trivia Game  Round in 90 seconds! Get ready!"
+  time.sleep(90)
+
   for client in activeClients:
     serverSocket.sendto(startingMessage.encode(), client)
     selectQuestions()
