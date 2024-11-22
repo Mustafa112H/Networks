@@ -43,52 +43,65 @@ def play_round():
     round_scores = {addr: 0 for addr in active_clients}
     selected_questions = random.sample(questions, 3)
 
-    active_participants = set()
-
     for q_index, question in enumerate(selected_questions):
         print(f"\nQuestion {q_index + 1}: {question['text']}")
         broadcast_message(f"Question {q_index + 1}: {question['text']}")
 
         # Collect answers for 30 seconds
         start_time = time.time()
-        answers = []
-        no_answer_clients = set(active_clients)  # Initially assume everyone hasn't answered
         answered_clients = set()  # Track clients who have already answered
-        correct_answer_count = 0  # Track the order of correct answers
+        timeout_clients = set()  # Track clients who timed out
+        counter = 0
 
         while time.time() - start_time < 30:
             try:
-                server_socket.settimeout(1)
+                server_socket.settimeout(1)  # Timeout for receiving answers
                 data, addr = server_socket.recvfrom(2048)
 
                 if addr in active_clients and addr not in answered_clients:
                     answered_clients.add(addr)  # Mark client as having answered
-                    no_answer_clients.discard(addr)  # Remove client from no-answer list
                     answer = data.decode().strip()
-                    response_time = time.time() - start_time
                     correct = (answer.lower() == question['answer'].lower())
-                    answers.append((addr, answer, response_time, correct))
 
-                    # If the answer is correct, increase the correct_answer_count
-                    if correct:
-                        correct_answer_count +=1
-                    round_scores[addr]+=(1-((correct_answer_count-1)/len(active_clients)))
+                    # Print and broadcast the client's answer
                     print(f"{active_clients[addr]} answered: '{answer}' (correct: {correct})")
+                    
+
+                    # If the answer is correct, increase the score
+                    if correct:
+                        round_scores[addr] += 1 - counter/len(active_clients)
+                        counter+=1
+
             except socket.timeout:
-                continue
+                continue  # Timeout expired, continue checking until 30 seconds are up
 
+        # After 30 seconds, mark clients who didn't answer
+        for client in active_clients:
+            if client not in answered_clients:
+                timeout_clients.add(client)
+                round_scores[client] += 0  # Treat their answer as "no answer"
 
-        # Broadcast the correct answer to all clients
+        # After the 30 seconds, broadcast the correct answer
         broadcast_message(f"The correct answer was: {question['answer']}")
 
-        # Broadcast the updated leaderboard
-        leaderboard = "\nCurrent Scores:\n" + "\n".join(
-            [f"{active_clients[addr]}: {round_scores[addr]:.2f} points" for addr in active_clients]
-        )
-        broadcast_message(leaderboard)
-        print(leaderboard)
+        # Short pause before broadcasting the updated leaderboard
+        time.sleep(2)
 
-        time.sleep(10)  # Wait before the next question
+    # After all questions, broadcast the leaderboard
+    leaderboard = "\nCurrent Scores:\n" + "\n".join(
+        [f"{active_clients[addr]}: {round_scores[addr]:.2f} points" for addr in active_clients]
+    )
+    broadcast_message(leaderboard)
+    print(leaderboard)
+    time.sleep(10)
+
+    # Remove clients who didn't answer any questions in the round
+    for client in timeout_clients:
+        if client in active_clients:
+            print(f"Removing client {active_clients[client]} due to inactivity.")
+            del active_clients[client]
+            del scores[client]
+            del rounds_won[client]
 
     # Determine round winner(s)
     max_score = max(round_scores.values(), default=0)
@@ -110,10 +123,8 @@ def play_round():
     print(f"Overall Leader: {overall_winner_names} with {max_rounds_won} rounds won!")
     time.sleep(3)  # Pause before starting the next round
 
-
 # Function to listen for new clients
 def listen_for_new_clients():
-    global active_clients
     while True:
         try:
             # Listen for incoming messages from any client
