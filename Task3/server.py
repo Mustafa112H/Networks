@@ -151,3 +151,4 @@ if __name__ == "__main__":
         else:
             time.sleep(5)
             print("Waiting for at least 2 players to join")
+        play_round()
