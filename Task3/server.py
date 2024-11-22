@@ -34,8 +34,7 @@ def broadcast_message(message):
     for client in active_clients:
         server_socket.sendto(message.encode(), client)
 
-# Function to play a round
-def play_round():
+#def play_round():
     global round_number
     round_number += 1
     print(f"\n--- Starting Round {round_number} ---")
@@ -47,41 +46,49 @@ def play_round():
     active_participants = set()
 
     for q_index, question in enumerate(selected_questions):
+        print(f"\nQuestion {q_index + 1}: {question['text']}")
         broadcast_message(f"Question {q_index + 1}: {question['text']}")
 
         # Collect answers for 30 seconds
         start_time = time.time()
         answers = []
         no_answer_clients = set(active_clients)  # Initially assume everyone hasn't answered
+        answered_clients = set()  # Track clients who have already answered
+        correct_answer_count = 0  # Track the order of correct answers
 
         while time.time() - start_time < 30:
             try:
                 server_socket.settimeout(1)
                 data, addr = server_socket.recvfrom(2048)
 
-                if addr in active_clients:
-                    no_answer_clients.discard(addr)  # Mark client as having answered
+                if addr in active_clients and addr not in answered_clients:
+                    answered_clients.add(addr)  # Mark client as having answered
+                    no_answer_clients.discard(addr)  # Remove client from no-answer list
                     answer = data.decode().strip()
                     response_time = time.time() - start_time
-                    answers.append((addr, answer, response_time))
-                    print(f"{active_clients[addr]} answered: '{answer}' (correct: {answer.lower() == question['answer'].lower()})")
+                    correct = (answer.lower() == question['answer'].lower())
+                    answers.append((addr, answer, response_time, correct))
+
+                    # If the answer is correct, increase the correct_answer_count
+                    if correct:
+                        correct_answer_count +=1
+                    round_scores[addr]+=(1-((correct_answer_count-1)/len(active_clients)))
+                    print(f"{active_clients[addr]} answered: '{answer}' (correct: {correct})")
             except socket.timeout:
                 continue
 
         # Mark clients who did not answer within the 30 seconds
         for addr in no_answer_clients:
-            answers.append((addr, "nothing", 30))
+            answers.append((addr, "nothing", 30, False))
 
-        correct_answer = question["answer"].lower()
-
-        # Loop through the answers and assign points based on order of response
-        for i, (addr, answer, _) in enumerate(answers):
-            if answer.lower() == correct_answer:
-                points = max(0, 1 - (i / len(active_clients)))  # Points decrease as more clients answer
+        # Loop through the answers and assign points based on order of correct responses
+        for addr, answer, _, correct in answers:
+            if correct:  # Only process correct answers
+                points = 1 - (correct_answer_count - 1) / len(active_clients) if correct_answer_count > 1 else 1
                 round_scores[addr] += points
 
         # Broadcast the correct answer to all clients
-        broadcast_message(f"The correct answer was: {correct_answer}")
+        broadcast_message(f"The correct answer was: {question['answer']}")
 
         # Broadcast the updated leaderboard
         leaderboard = "\nCurrent Scores:\n" + "\n".join(
@@ -112,6 +119,7 @@ def play_round():
     print(f"Overall Leader: {overall_winner_names} with {max_rounds_won} rounds won!")
     time.sleep(3)  # Pause before starting the next round
 
+
 # Function to listen for new clients
 def listen_for_new_clients():
     global active_clients
@@ -125,7 +133,7 @@ def listen_for_new_clients():
                     active_clients[addr] = client_name
                     scores[addr] = 0
                     rounds_won[addr] = 0
-                    print(f"New client joined: {client_name} ({addr})")
+                    print(f"\nNew client joined: {client_name} ({addr})\n")
                     broadcast_message(f"Welcome {client_name} to the trivia game!")
         except Exception as e:
             pass
@@ -151,5 +159,4 @@ if __name__ == "__main__":
             play_round()
         else:
             time.sleep(5)
-            print("Waiting for more clients to join")
-            broadcast_message("Waiting for more Players to join!")
+            print("Waiting for at least 2 players to join")
