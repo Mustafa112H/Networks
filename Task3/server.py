@@ -1,80 +1,153 @@
-from socket import *
-from questions import *
+import socket
 import random
 import time
 
-# Port on which the server listens
-serverPort = 9000
-hostName = gethostname()
-serverIP = gethostbyname(hostName)
+# Define the questions and correct answers
+questions = [
+    {"text": "Who painted the Mona Lisa?", "answer": "Leonardo da Vinci"},
+    {"text": "What is the square root of 64?", "answer": "8"},
+    {"text": "What year did World War II end?", "answer": "1945"},
+    {"text": "What is the capital of Germany?", "answer": "Berlin"},
+    {"text": "What is the smallest prime number?", "answer": "2"}
+]
 
-# UDP socket creation
-serverSocket = socket(AF_INET, SOCK_DGRAM)
+# Server settings
+server_port = 5689
 
-# Binding host address and port number
-serverSocket.bind((serverIP, serverPort))
+# Get the actual IP address of the server (excluding localhost)
+server_ip = socket.gethostbyname(socket.gethostname())
 
-# serverSocket.listen(3)
-print(f"Trivia Game server started and listening on ({serverIP}, {serverPort})\n")
+# Create UDP socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server_socket.bind((server_ip, server_port))
 
-# List of active clients on the server
-activeClients = []
+# Track active clients, their scores, and rounds won
+active_clients = {}
+scores = {}  # Track scores separately
+rounds_won = {}  # Track the number of rounds won by each client
+round_number = 0  # Track the number of rounds
 
-# Function to broadcast players in the game
-def broadcast_players(name):
-  message = f"{name} has joined the game!\n Current number of players: {len(activeClients)}"
-  for client in activeClients:
-    serverSocket.sendto(message.encode(), client)
+# Function to broadcast messages to all active clients
+def broadcast_message(message):
+    for client in active_clients:
+        server_socket.sendto(message.encode(), client)
 
-# Function to broadcast questions
-def broadcast_question(question, count):
-  message = f"Question {count}: {question}\n Your answer (or type 'exit' to quit):"
-  for client in activeClients:
-    serverSocket.sendto(message.encode(), client)
+# Function to handle client responses and play a round of trivia
+def play_round():
+    global round_number
+    round_number += 1
+    print(f"Round {round_number} is starting!")
+    broadcast_message(f"Round {round_number} is starting! Good luck!")
+    
+    # Reset round-specific scores
+    round_scores = {addr: 0 for addr in active_clients}
 
-# Function to select a number of questions
-def selectQuestions():
-  numberOfQuestion = 3
-  selectedQuestions = random.sample(questions, numberOfQuestion)
-  count = 0
-  # Broadcast questions to playeres
-  for i in selectedQuestions:
-    count += 1
-    if count > 1:
-      time.sleep(60)
-    print(f"Question {count}: {i}\n")
-    broadcast_question(i, count)
-    ###############################################################################################
-    ################# You can start working from here, accepting answers from players ##################
-    ###################################################################################################
+    # Randomly select questions
+    selected_questions = random.sample(questions, 3)
+    
+    for q_index, question in enumerate(selected_questions):
+        broadcast_message(f"Question {q_index + 1}: {question['text']}")
 
-# Function to start the game
-def startGame():
-  print("Starting the Trivia Game Round in 90 seconds!")
+        # Collect answers for 60 seconds
+        start_time = time.time()
+        answers = {}
 
-  # broadcasting a welcome message to notify clients that the round is about to start
-  startingMessage = "Starting the Trivia Game  Round in 90 seconds! Get ready!"
-  time.sleep(90)
+        while time.time() - start_time < 60:
+            try:
+                server_socket.settimeout(1)
+                data, addr = server_socket.recvfrom(2048)
+                
+                # Register new clients based on the address
+                if addr not in active_clients:
+                    active_clients[addr] = data.decode()  # Save the client's name
+                    scores[addr] = 0  # Initialize their total score
+                    rounds_won[addr] = 0  # Initialize rounds won
+                    print(f"New client joined: {addr} - {data.decode()}")
 
-  for client in activeClients:
-    serverSocket.sendto(startingMessage.encode(), client)
-    selectQuestions()
+                answer = data.decode().strip()
+                if addr not in answers:  # Only accept the first answer
+                    answers[addr] = answer
+                    client_name = active_clients[addr]  # Get the client name
+                    print(f"Received answer from {client_name} ({addr}): '{answer}'")
+            except socket.timeout:
+                continue
 
-while (True):
-  # Check minimum number of players
-  if (len(activeClients) < 2):
-    print("Waiting for at least 2 clients to join the game . . .")
-  else:
-    startGame()
+        # Validate answers and update round scores
+        correct_answer = question["answer"].lower()
+        broadcast_message(f"The correct answer was: {correct_answer}")
+        
+        for addr, answer in answers.items():
+            client_name = active_clients[addr]  # Get client name
+            if answer.lower() == correct_answer:
+                print(f"{client_name} answered '{answer}' correctly!")
+                round_scores[addr] += 1  # Update round score for correct answer
+            else:
+                print(f"{client_name} answered '{answer}' incorrectly.")
 
-  clientName, clientIP = serverSocket.recvfrom(2048)
-  # list client as active
-  if clientIP not in activeClients:
-    activeClients.append(clientIP)
+    # Determine the round winner(s)
+    max_score = max(round_scores.values(), default=0)
+    round_winners = [addr for addr, score in round_scores.items() if score == max_score]
 
-    print()
-    print(f"{clientName.decode()} joined the game from {clientIP}")
-    welcomingMessage = f"Registered with Trivia Game server at IP {serverIP}, Port {serverPort}\n Waiting for the game to start . . ."
+    for addr in round_winners:
+        rounds_won[addr] += 1  # Increment rounds won for the winner
+        scores[addr] += round_scores[addr]  # Add round score to total score
 
-    serverSocket.sendto(welcomingMessage.encode(), clientIP)
-    broadcast_players(clientName.decode())
+    # Announce round winner(s)
+    winner_names = ", ".join([active_clients[addr] for addr in round_winners])
+    broadcast_message(f"The winner of Round {round_number} is: {winner_names} with {max_score} points!")
+    print(f"The winner of Round {round_number} is: {winner_names} with {max_score} points!")
+
+    # Show current leaderboard
+    leaderboard = "Current Leaderboard:\n" + "\n".join(
+        [f"{active_clients[addr]}: {scores[addr]} points, {rounds_won[addr]} rounds won" for addr in scores]
+    )
+    broadcast_message(leaderboard)
+    print(leaderboard)
+
+    # Wait a moment before starting the next round
+    time.sleep(2)
+
+# Server loop to handle new clients and start game rounds
+if __name__ == "__main__":
+    print(f"Server is starting on {server_ip}:{server_port}")
+    print("Server is ready and listening for clients...\nwaiting for at least 2 clients...")
+    server_socket.settimeout(1)
+    while True:
+        # Handle new client connections dynamically
+        try:
+            data, addr = server_socket.recvfrom(2048)
+            if addr not in active_clients:
+                active_clients[addr] = data.decode()  # Register the new client
+                scores[addr] = 0  # Initialize total score
+                rounds_won[addr] = 0  # Initialize rounds won
+                print(f"New client joined: {addr} - {data.decode()}")
+
+                # Send a welcome message to the new client
+                server_socket.sendto("Welcome to the trivia game!".encode(), addr)
+                broadcast_message(f"A new player has joined the game: {data.decode()}")
+        except Exception as e:
+            pass
+
+        # Start a new round if there are at least 2 clients
+        if len(active_clients) >= 2:
+            broadcast_message("The round will start after 90 seconds. New clients can join now.")
+            print("The round will start after 90 seconds. New clients can join now.")
+
+            # Wait for 90 seconds to accept new players
+            t_end = time.time() + 90 
+            while time.time() < t_end:
+                try:    
+                    data, addr = server_socket.recvfrom(2048)
+                    if addr not in active_clients:
+                        active_clients[addr] = data.decode()  # Register the new client
+                        scores[addr] = 0  # Initialize total score
+                        rounds_won[addr] = 0  # Initialize rounds won
+                        print(f"New client joined: {addr} - {data.decode()}")
+
+                        # Send a welcome message to the new client
+                        server_socket.sendto("Welcome to the trivia game!".encode(), addr)
+                        broadcast_message(f"A new player has joined the game: {data.decode()}")
+                except:
+                    pass
+            # Start the round after 90 seconds
+            play_round()
