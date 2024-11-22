@@ -1,8 +1,9 @@
 import socket
 import random
 import time
-
-# Define the questions and correct answers
+import threading
+###HEY MAYSAMMMMMMM
+# Sample questions
 questions = [
     {"text": "Who painted the Mona Lisa?", "answer": "Leonardo da Vinci"},
     {"text": "What is the square root of 64?", "answer": "8"},
@@ -11,143 +12,135 @@ questions = [
     {"text": "What is the smallest prime number?", "answer": "2"}
 ]
 
-# Server settings
+# Server configuration
 server_port = 5689
-
-# Get the actual IP address of the server (excluding localhost)
 server_ip = socket.gethostbyname(socket.gethostname())
 
-# Create UDP socket
+# Create a UDP socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.bind((server_ip, server_port))
 
-# Track active clients, their scores, and rounds won
+# Track active clients, scores, and rounds won
 active_clients = {}
-scores = {}  # Track scores separately
-rounds_won = {}  # Track the number of rounds won by each client
-round_number = 0  # Track the number of rounds
+scores = {}
+rounds_won = {}
+round_number = 0
 
-# Function to broadcast messages to all active clients
+# Thread lock for thread-safe access to shared resources
+lock = threading.Lock()
+
+# Function to broadcast messages to all clients
 def broadcast_message(message):
     for client in active_clients:
         server_socket.sendto(message.encode(), client)
 
-# Function to handle client responses and play a round of trivia
+# Function to play a round
 def play_round():
     global round_number
     round_number += 1
-    print(f"Round {round_number} is starting!")
-    broadcast_message(f"Round {round_number} is starting! Good luck!")
+    print(f"\n--- Starting Round {round_number} ---")
+    broadcast_message(f"--- Starting Round {round_number} ---")
     
-    # Reset round-specific scores
     round_scores = {addr: 0 for addr in active_clients}
-
-    # Randomly select questions
     selected_questions = random.sample(questions, 3)
+
+    active_participants = set()
     
     for q_index, question in enumerate(selected_questions):
         broadcast_message(f"Question {q_index + 1}: {question['text']}")
 
-        # Collect answers for 60 seconds
+        # Collect answers for 30 seconds
         start_time = time.time()
-        answers = {}
+        answers = []
 
-        while time.time() - start_time < 60:
+        while time.time() - start_time < 30:
             try:
                 server_socket.settimeout(1)
                 data, addr = server_socket.recvfrom(2048)
-                
-                # Register new clients based on the address
-                if addr not in active_clients:
-                    active_clients[addr] = data.decode()  # Save the client's name
-                    scores[addr] = 0  # Initialize their total score
-                    rounds_won[addr] = 0  # Initialize rounds won
-                    print(f"New client joined: {addr} - {data.decode()}")
 
-                answer = data.decode().strip()
-                if addr not in answers:  # Only accept the first answer
-                    answers[addr] = answer
-                    client_name = active_clients[addr]  # Get the client name
-                    print(f"Received answer from {client_name} ({addr}): '{answer}'")
+                if addr in active_clients:
+                    active_participants.add(addr)  # Mark client as active
+                    answer = data.decode().strip()
+                    response_time = time.time() - start_time
+                    answers.append((addr, answer, response_time))
+                    print(f"{active_clients[addr]} answered: '{answer}' (correct: {answer.lower() == question['answer'].lower()})")
             except socket.timeout:
                 continue
 
-        # Validate answers and update round scores
         correct_answer = question["answer"].lower()
-        broadcast_message(f"The correct answer was: {correct_answer}")
-        
-        for addr, answer in answers.items():
-            client_name = active_clients[addr]  # Get client name
-            if answer.lower() == correct_answer:
-                print(f"{client_name} answered '{answer}' correctly!")
-                round_scores[addr] += 1  # Update round score for correct answer
-            else:
-                print(f"{client_name} answered '{answer}' incorrectly.")
 
-    # Determine the round winner(s)
+        # Loop through the answers and assign points based on order of response
+        for i, (addr, answer, _) in enumerate(answers):
+            if answer.lower() == correct_answer:
+                points = max(0, 1 - (i / len(active_clients)))  # Points decrease as more clients answer
+                round_scores[addr] += points
+
+        # Broadcast the correct answer to all clients
+        broadcast_message(f"The correct answer was: {correct_answer}")
+
+        # Broadcast the updated leaderboard
+        leaderboard = "\nCurrent Scores:\n" + "\n".join(
+            [f"{active_clients[addr]}: {round_scores[addr]:.2f} points" for addr in active_clients]
+        )
+        broadcast_message(leaderboard)
+        print(leaderboard)
+
+        time.sleep(10)  # Wait before the next question
+
+    # Determine round winner(s)
     max_score = max(round_scores.values(), default=0)
     round_winners = [addr for addr, score in round_scores.items() if score == max_score]
-
+    
     for addr in round_winners:
-        rounds_won[addr] += 1  # Increment rounds won for the winner
-        scores[addr] += round_scores[addr]  # Add round score to total score
+        rounds_won[addr] += 1
+        scores[addr] += round_scores[addr]
 
-    # Announce round winner(s)
     winner_names = ", ".join([active_clients[addr] for addr in round_winners])
-    broadcast_message(f"The winner of Round {round_number} is: {winner_names} with {max_score} points!")
-    print(f"The winner of Round {round_number} is: {winner_names} with {max_score} points!")
+    broadcast_message(f"Round {round_number} Winner(s): {winner_names} with {max_score:.2f} points!")
+    print(f"Round {round_number} Winner(s): {winner_names} with {max_score:.2f} points!")
 
-    # Show current leaderboard
-    leaderboard = "Current Leaderboard:\n" + "\n".join(
-        [f"{active_clients[addr]}: {scores[addr]} points, {rounds_won[addr]} rounds won" for addr in scores]
-    )
-    broadcast_message(leaderboard)
-    print(leaderboard)
+    # Announce overall winner
+    max_rounds_won = max(rounds_won.values(), default=0)
+    overall_winners = [addr for addr, wins in rounds_won.items() if wins == max_rounds_won]
+    overall_winner_names = ", ".join([active_clients[addr] for addr in overall_winners])
+    broadcast_message(f"Overall Leader: {overall_winner_names} with {max_rounds_won} rounds won!")
+    print(f"Overall Leader: {overall_winner_names} with {max_rounds_won} rounds won!")
+    time.sleep(3)  # Pause before starting the next round
 
-    # Wait a moment before starting the next round
-    time.sleep(2)
-
-# Server loop to handle new clients and start game rounds
-if __name__ == "__main__":
-    print(f"Server is starting on {server_ip}:{server_port}")
-    print("Server is ready and listening for clients...\nwaiting for at least 2 clients...")
-    server_socket.settimeout(1)
+# Function to listen for new clients
+def listen_for_new_clients():
+    global active_clients
     while True:
-        # Handle new client connections dynamically
         try:
+            # Listen for incoming messages from any client
             data, addr = server_socket.recvfrom(2048)
-            if addr not in active_clients:
-                active_clients[addr] = data.decode()  # Register the new client
-                scores[addr] = 0  # Initialize total score
-                rounds_won[addr] = 0  # Initialize rounds won
-                print(f"New client joined: {addr} - {data.decode()}")
-
-                # Send a welcome message to the new client
-                server_socket.sendto("Welcome to the trivia game!".encode(), addr)
-                broadcast_message(f"A new player has joined the game: {data.decode()}")
+            with lock:  # Ensure thread-safe access to active_clients
+                if addr not in active_clients:
+                    client_name = data.decode().strip()
+                    active_clients[addr] = client_name
+                    scores[addr] = 0
+                    rounds_won[addr] = 0
+                    print(f"New client joined: {client_name} ({addr})")
+                    broadcast_message(f"Welcome {client_name} to the trivia game!")
         except Exception as e:
             pass
 
-        # Start a new round if there are at least 2 clients
+# Server loop to accept clients and start the game
+if __name__ == "__main__":
+    print(f"Server is starting on {server_ip}:{server_port}")
+    server_socket.settimeout(5)
+    print("Server is ready and listening for clients...\n")
+
+    # Start the client listening thread
+    client_listener_thread = threading.Thread(target=listen_for_new_clients, daemon=True)
+    client_listener_thread.start()
+
+    while True:
+        # Start game when at least 2 clients are connected
         if len(active_clients) >= 2:
-            broadcast_message("The round will start after 90 seconds. New clients can join now.")
-            print("The round will start after 90 seconds. New clients can join now.")
+            broadcast_message("The game will start in 90 seconds. New clients can join now!")
+            print("\nThe game will start in 90 seconds. New clients can join now!\n")
+            time.sleep(90)  # Wait for 90 seconds to accept new players
 
-            # Wait for 90 seconds to accept new players
-            t_end = time.time() + 90 
-            while time.time() < t_end:
-                try:    
-                    data, addr = server_socket.recvfrom(2048)
-                    if addr not in active_clients:
-                        active_clients[addr] = data.decode()  # Register the new client
-                        scores[addr] = 0  # Initialize total score
-                        rounds_won[addr] = 0  # Initialize rounds won
-                        print(f"New client joined: {addr} - {data.decode()}")
-
-                        # Send a welcome message to the new client
-                        server_socket.sendto("Welcome to the trivia game!".encode(), addr)
-                        broadcast_message(f"A new player has joined the game: {data.decode()}")
-                except:
-                    pass
-            # Start the round after 90 seconds
+            # Start the round when at least 2 clients are connected
             play_round()
