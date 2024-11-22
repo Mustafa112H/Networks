@@ -144,3 +144,6 @@ if __name__ == "__main__":
 
             # Start the round when at least 2 clients are connected
             play_round()
+        else:
+            print("Waiting for more clients to join")
+            broadcast_message("Waiting for more Players to join!")
