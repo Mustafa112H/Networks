@@ -34,7 +34,7 @@ def broadcast_message(message):
     for client in active_clients:
         server_socket.sendto(message.encode(), client)
 
-#def play_round():
+def play_round():
     global round_number
     round_number += 1
     print(f"\n--- Starting Round {round_number} ---")
@@ -77,15 +77,6 @@ def broadcast_message(message):
             except socket.timeout:
                 continue
 
-        # Mark clients who did not answer within the 30 seconds
-        for addr in no_answer_clients:
-            answers.append((addr, "nothing", 30, False))
-
-        # Loop through the answers and assign points based on order of correct responses
-        for addr, answer, _, correct in answers:
-            if correct:  # Only process correct answers
-                points = 1 - (correct_answer_count - 1) / len(active_clients) if correct_answer_count > 1 else 1
-                round_scores[addr] += points
 
         # Broadcast the correct answer to all clients
         broadcast_message(f"The correct answer was: {question['answer']}")
