@@ -2,7 +2,7 @@ import socket
 import random
 import time
 import threading
-###HEY MAYSAMMMMMMM
+
 # Sample questions
 questions = [
     {"text": "Who painted the Mona Lisa?", "answer": "Leonardo da Vinci"},
@@ -45,13 +45,14 @@ def play_round():
     selected_questions = random.sample(questions, 3)
 
     active_participants = set()
-    
+
     for q_index, question in enumerate(selected_questions):
         broadcast_message(f"Question {q_index + 1}: {question['text']}")
 
         # Collect answers for 30 seconds
         start_time = time.time()
         answers = []
+        no_answer_clients = set(active_clients)  # Initially assume everyone hasn't answered
 
         while time.time() - start_time < 30:
             try:
@@ -59,13 +60,17 @@ def play_round():
                 data, addr = server_socket.recvfrom(2048)
 
                 if addr in active_clients:
-                    active_participants.add(addr)  # Mark client as active
+                    no_answer_clients.discard(addr)  # Mark client as having answered
                     answer = data.decode().strip()
                     response_time = time.time() - start_time
                     answers.append((addr, answer, response_time))
                     print(f"{active_clients[addr]} answered: '{answer}' (correct: {answer.lower() == question['answer'].lower()})")
             except socket.timeout:
                 continue
+
+        # Mark clients who did not answer within the 30 seconds
+        for addr in no_answer_clients:
+            answers.append((addr, "nothing", 30))
 
         correct_answer = question["answer"].lower()
 
@@ -145,5 +150,6 @@ if __name__ == "__main__":
             # Start the round when at least 2 clients are connected
             play_round()
         else:
+            time.sleep(5)
             print("Waiting for more clients to join")
             broadcast_message("Waiting for more Players to join!")
