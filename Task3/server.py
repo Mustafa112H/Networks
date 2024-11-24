@@ -3,18 +3,24 @@ import random
 import time
 import threading
 from clientObject import *
+import json
+import queue
 
 # Sample questions
 questions = [
-    {"text": "Who painted the Mona Lisa?", "answer": "Leonardo da Vinci"},
-    {"text": "What is the square root of 64?", "answer": "8"},
-    {"text": "What year did World War II end?", "answer": "1945"},
-    {"text": "What is the capital of Germany?", "answer": "Berlin"},
-    {"text": "What is the smallest prime number?", "answer": "2"}
+    {"question": "Who painted the Mona Lisa?", "answer": "Leonardo da Vinci"},
+    {"question": "What is the square root of 64?", "answer": "8"},
+    {"question": "What year did World War II end?", "answer": "1945"},
+    {"question": "What is the capital of Germany?", "answer": "Berlin"},
+    {"question": "What is the smallest prime number?", "answer": "2"}
 ]
 
+# Loading data from JSON file into a dictionary
+with open('gameSettings.json', 'r') as jsonFile:
+    config = json.load(jsonFile)
+
 # Server configuration
-serverPort = 6046
+serverPort = 7066
 serverIP = socket.gethostbyname(socket.gethostname())
 
 # Create a UDP socket
@@ -23,107 +29,80 @@ serverSocket.bind((serverIP, serverPort))
 
 # Declaring a list of client objects to keep track of active clients
 activeClients = []
+# Declaring a queue to store client's answers before correction
+answersQueue = queue.Queue()
 
+############################################################################################################
+###########################################################################################
 scores = {}
 rounds_won = {}
 round_number = 0
 
 # Thread lock for thread-safe access to shared resources
 lock = threading.Lock()
+###########################################################################################
+################################################################################################################
 
 # Function to broadcast messages to all clients
-def broadcast_message(message):
+def broadcastMessage(message):
     for client in activeClients:
         serverSocket.sendto(message.encode(), client.address)
 
-def play_round():
-    global round_number
-    round_number += 1
-    print(f"\n--- Starting Round {round_number} ---")
-    broadcast_message(f"--- Starting Round {round_number} ---")
-    
-    round_scores = {addr: 0 for addr in activeClients}
-    selected_questions = random.sample(questions, 3)
+def broadcastScores(correctAnswersCount):
+    print()
 
-    for q_index, question in enumerate(selected_questions):
-        print(f"\nQuestion {q_index + 1}: {question['text']}")
-        broadcast_message(f"Question {q_index + 1}: {question['text']}")
+def resetInRound():
+    # Reset clients' answering status
+    for client in activeClients:
+        client.answered = False
 
-        # Collect answers for 30 seconds
-        start_time = time.time()
-        answered_clients = set()  # Track clients who have already answered
-        timeout_clients = set()  # Track clients who timed out
-        counter = 0
+# Function to collect answers from clients
+def collectAnswers(question, startTime):
+    correctAnswersCount = 0
+    # Keep collecting answers for specific amount of time
+    while time.time() - startTime < int(config['answerCollectionTime']):
+        if answersQueue.qsize() > 0:
+            # retrieve answers in order
+            address, answer = answersQueue.get()
+            for client in activeClients:
+                if client.address == address:
+                    # determine correctness of the answer
+                    status = "Incorrect!"
+                    if answer.lower() == question['answer'].lower():
+                        correctAnswersCount += 1
+                        status = "Correct!"
+                    print(f"Received answer from {client.name} {client.address}: {answer} - {status}\n")
 
-        while time.time() - start_time < 30:
-            try:
-                serverSocket.settimeout(1)  # Timeout for receiving answers
-                data, addr = serverSocket.recvfrom(2048)
+    print("Time's up!\n")
+    broadcastMessage(f"Time's up! The correct answer was: {question['answer']}\n")
+    broadcastScores(correctAnswersCount)
+    resetInRound()
 
-                if addr in activeClients and addr not in answered_clients:
-                    answered_clients.add(addr)  # Mark client as having answered
-                    answer = data.decode().strip()
-                    correct = (answer.lower() == question['answer'].lower())
+# Function to start a round in the game
+def startRound():
+    # Select random questions to display
+    selectedQuestions = random.sample(questions, int(config['numberOfQuestions']))
 
-                    # Print and broadcast the client's answer
-                    print(f"{activeClients[addr]} answered: '{answer}' (correct: {correct})")
-                    
+    # Iterate through selected questions
+    for index, question in enumerate(selectedQuestions, start=1):
+        print(f"Question {index}: {question['question']}")
+        broadcastMessage(f"\nQuestion {index}: {question['question']}")
+        startTime = time.time()
 
-                    # If the answer is correct, increase the score
-                    if correct:
-                        round_scores[addr] += 1 - counter/len(activeClients)
-                        counter+=1
+        # Create a thread to handle answer collection
+        # collectionThread = threading.Thread(target=collectAnswers,args=(startTime, ) daemon=True)
+        # collectionThread.start()
+        collectAnswers(question, startTime)
 
-            except socket.timeout:
-                continue  # Timeout expired, continue checking until 30 seconds are up
+# Function to start the game
+def startGame():
+    for i in range(int(config['numberOfRounds'])):
+        print(f"--- Round {i+1} ---")
+        # Start the round
+        startRound()
 
-        # After 30 seconds, mark clients who didn't answer
-        for client in activeClients:
-            if client not in answered_clients:
-                timeout_clients.add(client)
-                round_scores[client] += 0  # Treat their answer as "no answer"
-
-        # After the 30 seconds, broadcast the correct answer
-        broadcast_message(f"The correct answer was: {question['answer']}")
-
-        # Short pause before broadcasting the updated leaderboard
-        time.sleep(2)
-
-    # After all questions, broadcast the leaderboard
-    leaderboard = "\nCurrent Scores:\n" + "\n".join(
-        [f"{activeClients[addr]}: {round_scores[addr]:.2f} points" for addr in activeClients]
-    )
-    broadcast_message(leaderboard)
-    print(leaderboard)
-    time.sleep(10)
-
-    # Remove clients who didn't answer any questions in the round
-    for client in timeout_clients:
-        if client in activeClients:
-            print(f"Removing client {activeClients[client]} due to inactivity.")
-            del activeClients[client]
-            del scores[client]
-            del rounds_won[client]
-
-    # Determine round winner(s)
-    max_score = max(round_scores.values(), default=0)
-    round_winners = [addr for addr, score in round_scores.items() if score == max_score]
-    
-    for addr in round_winners:
-        rounds_won[addr] += 1
-        scores[addr] += round_scores[addr]
-
-    winner_names = ", ".join([activeClients[addr] for addr in round_winners])
-    broadcast_message(f"Round {round_number} Winner(s): {winner_names} with {max_score:.2f} points!")
-    print(f"Round {round_number} Winner(s): {winner_names} with {max_score:.2f} points!")
-
-    # Announce overall winner
-    max_rounds_won = max(rounds_won.values(), default=0)
-    overall_winners = [addr for addr, wins in rounds_won.items() if wins == max_rounds_won]
-    overall_winner_names = ", ".join([activeClients[addr] for addr in overall_winners])
-    broadcast_message(f"Overall Leader: {overall_winner_names} with {max_rounds_won} rounds won!")
-    print(f"Overall Leader: {overall_winner_names} with {max_rounds_won} rounds won!")
-    time.sleep(3)  # Pause before starting the next round
+        # allowing players time to review the leaderboard and prepare for the next round
+        time.sleep(int(config['waitingBetweenRoundsTime']))
 
 # Function to check if a client is active before appending to the list
 def isClientActive(address):
@@ -137,25 +116,34 @@ def listenForClients():
     while True:
         try:
             # Listen for incoming messages from any client
-            name, address = serverSocket.recvfrom(2048)
+            message, address = serverSocket.recvfrom(2048)
             # if not already active, append new client to the active list
             if not isClientActive(address):
-                newClient = ClientObject(name.decode(), address)
+                newClient = ClientObject(message.decode(), address)
                 activeClients.append(newClient)
                 
-            
-                # Create a child thread to take care of that client
-                clientThread = threading.Thread(target=serviceClient, args=(newClient, ), daemon=True)
-                clientThread.start()
-
                 # Announce the new player
-                broadcast_message(f"{newClient.name} has joined the game!\n Current number of players: {len(activeClients)}")
+                print(f"{newClient.name} joined the game from {newClient.address}\n")
+                broadcastMessage(f"\n{newClient.name} has joined the game!\n Current number of players: {len(activeClients)}")
+            else:
+                # Create a child thread to take care of that client
+                clientThread = threading.Thread(target=serviceClient, args=(message, address, ), daemon=True)
+                clientThread.start()
         except Exception as e:
             pass
 
 # Function to listen to messages from each client
-def serviceClient(client):
-    print(f"{client.name} joined the game from {client.address}\n")
+def serviceClient(answer, address):
+    # Acknowledge client from address
+    for client in activeClients:
+        if client.address == address:
+            # accept answer if not a duplicate
+            if ( answer.decode() and client.answered != True):
+                # change state
+                client.answered = True
+                # Enqueue answer
+                answersQueue.put((address, answer.decode()))
+                serverSocket.sendto(f"Answer submitted: {answer.decode()}".encode(), address)
     
 
 # Main function to carry out the server's logic
@@ -167,18 +155,19 @@ def main():
     # Creating a parent thread to handle clients while the game is on
     parentThread = threading.Thread(target=listenForClients, daemon=True)
     parentThread.start()
+    # listenForClients()
 
     # Main loop to start the game
     while True:
         # Start the game if at least two active clients
         if len(activeClients) >= 2:
-            broadcast_message("The game will start in 90 seconds. New clients can join now!")
+            broadcastMessage("\nThe game will start in 90 seconds. New clients can join now!")
             print("\nThe game will start in 90 seconds. New clients can join now!\n")
             # Give players 90 seconds to perpare
-            time.sleep(90) 
+            time.sleep(30) 
 
             # Starting the game
-            play_round()
+            startGame()
         else:
             time.sleep(5)
             print("Waiting for at least 2 clients to join the game...")

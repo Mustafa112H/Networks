@@ -8,3 +8,4 @@ class ClientObject:
     self.name = name
     self.score = 0
     self.answered = False
+    self.correct = False

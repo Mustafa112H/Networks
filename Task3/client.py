@@ -17,12 +17,12 @@ def connectWithServer(serverIP, serverPort):
         try:
             # Receive and print messages from the server
             message, _ = clientSocket.recvfrom(2048)
-            print("\nServer: " + message.decode())
+            print(message.decode())
 
             # Check if the message is a question or other game instruction
             if "Question" in message.decode():
                 # Prompt for an answer when a question is received
-                answer = input("\nEnter your answer (or type 'exit' to quit): ")
+                answer = input("Enter your answer (or type 'exit' to quit): ")
 
                 # Send answer to the server
                 if answer.lower() == 'exit':

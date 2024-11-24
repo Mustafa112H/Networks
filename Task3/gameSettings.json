@@ -1,3 +1,7 @@
 {
-  
+  "numberOfQuestions": "3",
+  "numberOfRounds": "1",
+  "waitingBetweenRoundsTime": "60",
+  "waitingBetweenQuestionsTime": "60",
+  "answerCollectionTime": "60"
 }
