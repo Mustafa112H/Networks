@@ -1,3 +1,9 @@
+# ENCS3320: Computer Networks course project
+# Task 3 – UDP Client-Server Trivia Game Using Socket Programming
+# Partners: 
+#           Maysam Habbash 1220075, section: 1
+#           Heba Mustafa 1221916, section: 1
+
 import socket
 import random
 import time
@@ -20,7 +26,7 @@ with open('gameSettings.json', 'r') as jsonFile:
     config = json.load(jsonFile)
 
 # Server configuration
-serverPort = 7777
+serverPort = 5689
 serverIP = socket.gethostbyname(socket.gethostname())
 
 # Create a UDP socket
@@ -33,16 +39,8 @@ activeClients = []
 answersQueue = queue.Queue()
 tempQueue = queue.Queue()
 
-############################################################################################################
-###########################################################################################
-scores = {}
-rounds_won = {}
-round_number = 0
-
 # Thread lock for thread-safe access to shared resources
 lock = threading.Lock()
-###########################################################################################
-################################################################################################################
 
 # Function to broadcast messages to all clients
 def broadcastMessage(message):
@@ -128,7 +126,7 @@ def startRound():
             maxScore = client.score
             roundWinner = client
     roundWinner.roundsWon += 1
-    
+
         # max rounds winner
     maxRoundWins = 0
     for client in activeClients:
@@ -153,13 +151,15 @@ def startGame():
         startRound()
 
         # not last round
-        if i != config['numberOfRounds']:
+        if i != int(config['numberOfRounds'])-1:
             # allowing players time to review the leaderboard and prepare for the next round
             print(f"Next round will start in {config['waitingBetweenRoundsTime']} seconds")
             broadcastMessage(f"Next round will start in {config['waitingBetweenRoundsTime']} seconds")
             time.sleep(int(config['waitingBetweenRoundsTime']))
     # end game
     broadcastMessage("The game has ended")
+    for i in activeClients:
+        activeClients.remove(i)
 
 # Function to check if a client is active before appending to the list
 def isClientActive(address):

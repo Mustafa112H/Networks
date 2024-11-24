@@ -1,3 +1,9 @@
+# ENCS3320: Computer Networks course project
+# Task 3 – UDP Client-Server Trivia Game Using Socket Programming
+# Partners: 
+#           Maysam Habbash 1220075, section: 1
+#           Heba Mustafa 1221916, section: 1
+
 from socket import *
 
 # UDP client socket creation
