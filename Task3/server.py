@@ -31,6 +31,7 @@ serverSocket.bind((serverIP, serverPort))
 activeClients = []
 # Declaring a queue to store client's answers before correction
 answersQueue = queue.Queue()
+tempQueue = queue.Queue()
 
 ############################################################################################################
 ###########################################################################################
@@ -48,13 +49,35 @@ def broadcastMessage(message):
     for client in activeClients:
         serverSocket.sendto(message.encode(), client.address)
 
+# Function to calculate and broadcast scores
 def broadcastScores(correctAnswersCount):
-    print()
+    correct = 0
+    temp = correctAnswersCount
+    # Iterate through answers
+    for i in range(tempQueue.qsize()):
+        address, _ = tempQueue.get()
+        for client in activeClients: 
+            # Acknowledge client
+            if (client.address == address):
+                if client.isCorrect == True:
+                    # First client to answer correctly
+                    correct += 1
+                    if (correct) == 1:
+                        client.score += 1
+                        client.roundsWon += 1
+                    else:
+                        temp -= 1
+                        client.score += (temp)/correctAnswersCount
+    # brodcast scores
+    broadcastMessage("Current scores:")
+    for client in activeClients:
+        broadcastMessage(f"\t* {client.name}: {client.score} points")
 
 def resetInRound():
     # Reset clients' answering status
     for client in activeClients:
-        client.answered = False
+        client.hasAnswered = False
+        client.isCorrect = False
 
 # Function to collect answers from clients
 def collectAnswers(question, startTime):
@@ -71,6 +94,7 @@ def collectAnswers(question, startTime):
                     if answer.lower() == question['answer'].lower():
                         correctAnswersCount += 1
                         status = "Correct!"
+                        client.isCorrect = True
                     print(f"Received answer from {client.name} {client.address}: {answer} - {status}\n")
 
     print("Time's up!\n")
@@ -93,11 +117,13 @@ def startRound():
         # collectionThread = threading.Thread(target=collectAnswers,args=(startTime, ) daemon=True)
         # collectionThread.start()
         collectAnswers(question, startTime)
+        time.sleep(int(config['waitingBetweenQuestionsTime']))
 
 # Function to start the game
 def startGame():
     for i in range(int(config['numberOfRounds'])):
         print(f"--- Round {i+1} ---")
+        broadcastMessage(f"--- Round {i+1} ---")
         # Start the round
         startRound()
 
@@ -138,11 +164,12 @@ def serviceClient(answer, address):
     for client in activeClients:
         if client.address == address:
             # accept answer if not a duplicate
-            if ( answer.decode() and client.answered != True):
+            if ( answer.decode() and client.hasAnswered != True):
                 # change state
-                client.answered = True
+                client.hasAnswered = True
                 # Enqueue answer
                 answersQueue.put((address, answer.decode()))
+                tempQueue.put((address, answer.decode()))
                 serverSocket.sendto(f"Answer submitted: {answer.decode()}".encode(), address)
     
 

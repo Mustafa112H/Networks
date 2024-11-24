@@ -7,5 +7,6 @@ class ClientObject:
     self.address = address
     self.name = name
     self.score = 0
-    self.answered = False
-    self.correct = False
+    self.hasAnswered = False
+    self.isCorrect = False
+    self.roundsWon = 0
