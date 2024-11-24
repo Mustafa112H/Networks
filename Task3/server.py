@@ -20,7 +20,7 @@ with open('gameSettings.json', 'r') as jsonFile:
     config = json.load(jsonFile)
 
 # Server configuration
-serverPort = 7066
+serverPort = 7777
 serverIP = socket.gethostbyname(socket.gethostname())
 
 # Create a UDP socket
@@ -64,7 +64,6 @@ def broadcastScores(correctAnswersCount):
                     correct += 1
                     if (correct) == 1:
                         client.score += 1
-                        client.roundsWon += 1
                     else:
                         temp -= 1
                         client.score += (temp)/correctAnswersCount
@@ -118,17 +117,49 @@ def startRound():
         # collectionThread.start()
         collectAnswers(question, startTime)
         time.sleep(int(config['waitingBetweenQuestionsTime']))
+    
+    # End round
+    broadcastMessage("GAME OVER!")
+    # Announce winner
+        #round Winner   
+    maxScore = 0
+    for client in activeClients:
+        if client.score > maxScore:
+            maxScore = client.score
+            roundWinner = client
+    roundWinner.roundsWon += 1
+    
+        # max rounds winner
+    maxRoundWins = 0
+    for client in activeClients:
+        if client.roundsWon > maxRoundWins:
+            maxRoundWins = client.roundsWon
+            winner = client
+
+        # disconnect inactive clients
+        if client.score == 0:
+            serverSocket.sendto("The game has ended".encode(), client.address)
+            activeClients.remove(client)
+        # reset score
+        client.score = 0
+    broadcastMessage(f"The winner is {winner.name} with {winner.roundsWon} rounds! Congratulations!")
 
 # Function to start the game
 def startGame():
     for i in range(int(config['numberOfRounds'])):
-        print(f"--- Round {i+1} ---")
-        broadcastMessage(f"--- Round {i+1} ---")
+        print(f"\t--- Round {i+1} ---")
+        broadcastMessage(f"\t--- Round {i+1} ---")
         # Start the round
         startRound()
 
-        # allowing players time to review the leaderboard and prepare for the next round
-        time.sleep(int(config['waitingBetweenRoundsTime']))
+        # not last round
+        if i != config['numberOfRounds']:
+            # allowing players time to review the leaderboard and prepare for the next round
+            print(f"Next round will start in {config['waitingBetweenRoundsTime']} seconds")
+            broadcastMessage(f"Next round will start in {config['waitingBetweenRoundsTime']} seconds")
+            time.sleep(int(config['waitingBetweenRoundsTime']))
+    # end game
+    broadcastMessage("The game has ended")
 
 # Function to check if a client is active before appending to the list
 def isClientActive(address):
