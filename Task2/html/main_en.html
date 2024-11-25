@@ -1,137 +1,174 @@
+ <!-- 
+ ENCS3320: Computer Networks course project
+ Task 2
+ Partners: 
+           Maysam Habbash 1220075, section: 1
+           Heba Mustafa 1221916, section: 1 -->
+
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="..\css\styles.css">
-    <title>ENCS3320-Webserver</title>
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Linking the css file for styling the page -->
+        <link rel="stylesheet" type="text/css" href="..\css\styles.css">
+        <!-- Title to be viewed in the browser's tab -->
+        <title>ENCS3320-Webserver</title>
+    </head>
 
+    <body>       
+        <header>
+            <!-- Main header of the web page -->
+            <h1>Welcome to ENCS3320 - Computer Networks Webserver</h1>
+        </header>
 
+        <!-- Section for viewing descrition of each team member -->
+        <section>
+            <h2>Team Members</h2>
 
-<body>       
-    <header>
-        <h1>Welcome to ENCS3320 - Computer Networks Webserver</h1>
-    </header>
+            <!-- team Members go here -->                           
+            <div class="team-member-container">
+                <!-- first member -->
+                <div class="team-member-box">
+                    <div class="team-member">
+                        <div class="team-member-photo">
 
-    <section>
-        <h2>Team Members</h2>
+                            <!-- Picture view of team member -->
+                            <img src="..\imgs\HebaMustafa.png" alt="Heba Mustafa">
+                        </div>
+                        <div class="team-member-info">
 
-        <!--team Members go here-->                           
-        <div class="team-member-container">
-            <!--first mem-->
-            <div class="team-member-box">
-                <div class="team-member">
-                    <div class="team-member-photo">
-                        <img src="..\imgs\HebaMustafa.png" alt="Heba Mustafa">
+                            <!-- Name and ID view of team member -->
+                            <p><strong>Name:</strong> Heba Mustafa</p>
+                            <p><strong>ID:</strong> 1221916</p>
+                        </div>
+                        <div class="team-member-description">    
+
+                            <!-- Description of team member -->
+                            <p><strong>Description:</strong> Heba is an aspiring Computer Engineer with a passion for AI and
+                                Machine Learning, and computer architecture. Proficient in Python, C, Java, HTML, and CSS,
+                                she combines creativity with problem-solving in every project. In her free time, she enjoys
+                                playing table tennis. Always eager to learn and grow in the tech field.</p>
+                        </div>
                     </div>
-                    <div class="team-member-info">
-                        <p><strong>Name:</strong> Heba Mustafa</p>
-                        <p><strong>ID:</strong> 1221916</p>
-                    </div>
-                    <div class="team-member-description">            
-                        <p><strong>Description:</strong> Heba is an aspiring Computer Engineer with a passion for AI and
-                            Machine Learning, and computer architecture. Proficient in Python, C, Java, HTML, and CSS,
-                            she combines creativity with problem-solving in every project. In her free time, she enjoys
-                            playing table tennis. Always eager to learn and grow in the tech field.</p>
+                </div>
+
+                <!-- second member -->
+                <div class="team-member-box">
+                    <div class="team-member">
+                        <div class="team-member-photo">
+
+                            <!-- Picture view of team member -->
+                            <img src="..\imgs\MaysamHabbash.png" alt="Maysam Habbash">
+                        </div>
+                        <div class="team-member-info">
+
+                            <!-- Name and ID view of team member -->        
+                            <p><strong>Name:</strong> Maysam Habbash</p>           
+                            <p><strong>ID:</strong> 1220075</p>
+                        </div>
+                        <div class="team-member-description">
+
+                            <!-- Description of team member -->
+                            <p><strong>Description:</strong> Maysam is a highly intelligent Computer Engineering student
+                                with a deep passion for hardware and all things tech. She is proficient in Java, C, Python,
+                                and Shell scripting. Maysam is known for her exceptional problem-solving skills and has a
+                                bright future in the tech world. Outside of her studies, she enjoys playing table tennis and
+                                basketball. A truly promising talent, Maysam’s intelligence and determination set her apart
+                                as one of the smartest individuals in her field.</p>
+                        </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!--second member-->
-            <div class="team-member-box">
-                <div class="team-member">
-                    <div class="team-member-photo">
-                        <img src="..\imgs\MaysamHabbash.png" alt="Maysam Habbash">
-                    </div>
-                    <div class="team-member-info">          
-                        <p><strong>Name:</strong> Maysam Habbash</p>           
-                        <p><strong>ID:</strong> 1220075</p>
-                    </div>
-                    <div class="team-member-description">
-                        <p><strong>Description:</strong> Maysam is a highly intelligent Computer Engineering student
-                            with a deep passion for hardware and all things tech. She is proficient in Java, C, Python,
-                            and Shell scripting. Maysam is known for her exceptional problem-solving skills and has a
-                            bright future in the tech world. Outside of her studies, she enjoys playing table tennis and
-                            basketball. A truly promising talent, Maysam’s intelligence and determination set her apart
-                            as one of the smartest individuals in her field.</p>
-                    </div>
+        <!-- Section for presenting a topic from textbook -->
+        <section>
+            <!-- Title of the topic -->
+            <h2 class="header-2"><strong>Types of Delay in Packet-Switched Networks</strong></h2>
+
+            <div class="container-picture">
+                <!-- Image view to support the topic -->
+                <img src="..\imgs\nodal_delay_at_router.JPG" alt="Nodal delay at a router" class="image">
+
+                <!-- Caption for referencing the image -->
+                <figcaption><i>Source: Kurose, J., & Ross, K. (2017). <em>Computer Networking: A Top-Down Approach</em>, 8th
+                        Edition. Pearson.</i></figcaption>
+
+                <!-- Topic description -->
+                <p class="paragraph">
+                    The image illustrates the components of nodal delay in a packet-switched network as a packet moves
+                    through Router A to its destination. The process begins with nodal processing, where the router examines
+                    the packet header, performs routing decisions, and checks for errors. Next is the queueing delay, which
+                    occurs if the outgoing link is busy, causing packets to wait in a queue; the extent of this delay
+                    depends on network congestion and the number of packets ahead. Following this, the transmission delay
+                    occurs as the router transmits the packet onto the link, determined by the packet size and link
+                    bandwidth. Finally, the propagation delay is the time it takes for the packet to travel across the
+                    physical link to the next node, depending on the distance between the nodes and the medium's propagation
+                    speed.
+                </p>
+            </div>
+
+            <div>
+                <!-- Ordered list -->
+                <ol start="1">
+
+                    <li class="ordered-list">Processing Delay:</li>
+                    <!-- Unordered list -->
+                    <ul>
+                        <li class="unordered-list">The time taken by a router to inspect a packet's header and determine its
+                            forwarding path.</li>
+                        <li class="unordered-list">Includes error checking and routing decisions.</li>
+                        <li class="unordered-list">Typically on the order of microseconds.</li>
+                    </ul>
+
+                    <li class="ordered-list">Queuing Delay:</li>
+                    <!-- Unordered list -->
+                    <ul>
+                        <li class="unordered-list">Occurs when a packet waits in a queue for transmission.</li>
+                        <li class="unordered-list">The duration depends on the current network congestion and the number of
+                            packets already in the queue.</li>
+                        <li class="unordered-list">Can vary from negligible to significant, depending on the traffic load.
+                        </li>
+                    </ul>
+
+                    <li class="ordered-list">Transmission Delay:</li>
+                    <!-- Unordered list -->
+                    <ul>
+                        <li class="unordered-list">The time required to push all of a packet's bits onto the transmission
+                            link.</li>
+                        <li class="unordered-list">Depends on the packet size and the bandwidth of the link.</li>
+                        <li class="unordered-list">Calculated as Packet Size / Link Bandwidth.</li>
+                    </ul>
+
+                    <li class="ordered-list">Propagation Delay:</li>
+                    <!-- Unordered list -->
+                    <ul>
+                        <li class="unordered-list">The time for a packet to travel from one end of the link to the other.
+                        </li>
+                        <li class="unordered-list">Determined by the distance between routers and the speed of the
+                            transmission medium.</li>
+                    </ul>
+
+                </ol>
+
+                <p class="paragraph">For more information on networking concepts, refer to <em>Computer Networking: A Top-Down Approach</em>
+                    by James Kurose and Keith Ross.</p>
+            </div>
+
+            <!-- Footer providing links -->
+            <footer class="footer">
+                <div class="links-footer-en">
+                    <h3 class="header-3">Navigation bar:</h3>
+                    <!-- Navigation links -->
+                    <p><a href="supporting_material_en.html">Supporting material page</a></p>
+                    <p><a href="https://gaia.cs.umass.edu/kurose_ross/index.php">Textbook website</a></p>
+                    <p><a href="https://ritaj.birzeit.edu/">Ritaj website</a></p>
                 </div>
-            </div>
-        </div>
-    </section>
+            </footer>
+        </section>
 
-    <section>
-        <h2 class="header-2"><strong>Types of Delay in Packet-Switched Networks</strong></h2>
-
-        <div class="container-picture">
-            <img src="..\imgs\nodal_delay_at_router.JPG" alt="Nodal delay at a router" class="image">
-            <figcaption><i>Source: Kurose, J., & Ross, K. (2017). <em>Computer Networking: A Top-Down Approach</em>, 8th
-                    Edition. Pearson.</i></figcaption>
-            <p class="paragraph">
-                The image illustrates the components of nodal delay in a packet-switched network as a packet moves
-                through Router A to its destination. The process begins with nodal processing, where the router examines
-                the packet header, performs routing decisions, and checks for errors. Next is the queueing delay, which
-                occurs if the outgoing link is busy, causing packets to wait in a queue; the extent of this delay
-                depends on network congestion and the number of packets ahead. Following this, the transmission delay
-                occurs as the router transmits the packet onto the link, determined by the packet size and link
-                bandwidth. Finally, the propagation delay is the time it takes for the packet to travel across the
-                physical link to the next node, depending on the distance between the nodes and the medium's propagation
-                speed.
-            </p>
-        </div>
-
-
-        <!-- Ordered list -->
-        <div>
-            <ol start="1">
-                <li class="ordered-list">Processing Delay:</li>
-                <!-- Unordered list -->
-                <ul>
-                    <li class="unordered-list">The time taken by a router to inspect a packet's header and determine its
-                        forwarding path.</li>
-                    <li class="unordered-list">Includes error checking and routing decisions.</li>
-                    <li class="unordered-list">Typically on the order of microseconds.</li>
-                </ul>
-                <li class="ordered-list">Queuing Delay:</li>
-                <ul>
-                    <li class="unordered-list">Occurs when a packet waits in a queue for transmission.</li>
-                    <li class="unordered-list">The duration depends on the current network congestion and the number of
-                        packets already in the queue.</li>
-                    <li class="unordered-list">Can vary from negligible to significant, depending on the traffic load.
-                    </li>
-                </ul>
-                <li class="ordered-list">Transmission Delay:</li>
-                <ul>
-                    <li class="unordered-list">The time required to push all of a packet's bits onto the transmission
-                        link.</li>
-                    <li class="unordered-list">Depends on the packet size and the bandwidth of the link.</li>
-                    <li class="unordered-list">Calculated as Packet Size / Link Bandwidth.</li>
-                </ul>
-                <li class="ordered-list">Propagation Delay:</li>
-                <ul>
-                    <li class="unordered-list">The time for a packet to travel from one end of the link to the other.
-                    </li>
-                    <li class="unordered-list">Determined by the distance between routers and the speed of the
-                        transmission medium.</li>
-                </ul>
-            </ol>
-            <p class="paragraph">For more information on networking concepts, refer to <em>Computer Networking: A Top-Down Approach</em>
-                by James Kurose and Keith Ross.</p>
-        </div>
-
-        <!-- Footer providing links -->
-        <footer class="footer">
-            <div class="links-footer-en">
-                <h3 class="header-3">Navigation bar:</h3>
-                <p><a href="supporting_material_en.html">Supporting material page</a></p>
-                <p><a href="https://gaia.cs.umass.edu/kurose_ross/index.php">Textbook website</a></p>
-                <p><a href="https://ritaj.birzeit.edu/">Ritaj website</a></p>
-            </div>
-        </footer>
-    </section>
-
-</body>
+    </body>
 
 </html>
