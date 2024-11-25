@@ -1,5 +1,10 @@
 import os
 import socket
+# ENCS3320: Computer Networks course project
+# Task 2
+# Partners: 
+#           Maysam Habbash 1220075, section: 1
+#           Heba Mustafa 1221916, section: 1
 
 #setting up the server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
