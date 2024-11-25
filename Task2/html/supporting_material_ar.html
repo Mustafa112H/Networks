@@ -1,32 +1,52 @@
+<!-- 
+ ENCS3320: Computer Networks course project
+ Task 2
+ Partners: 
+           Maysam Habbash 1220075, section: 1
+           Heba Mustafa 1221916, section: 1 -->
+
 <!DOCTYPE html>
+<!-- Language of web page -->
 <html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المواد الداعمة</title>
-    <link rel="stylesheet" href="../css/style_support.css">
-</head>
-<body>
-    <div class="content-wrapper">
-        <header>
-            <h1>طلب المواد الداعمة</h1>
-        </header>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Linking the css file for styling the page -->
+        <link rel="stylesheet" href="../css/style_support.css">
+        <!-- Title to be viewed in the browser's tab -->
+        <title>المواد الداعمة</title>
+    </head>
 
-        <section class="container-picture">
-            <h2>طلب ملف</h2>
-            <p>(image.png أو video.mp4 مثل) أدخل اسم الملف واضغط على "طلب" للحصول على المادة المقابلة</p>
+    <body>
+        <div class="content-wrapper">
+            <header>
+                <!-- Main header in page -->
+                <h1>طلب المواد الداعمة</h1>
+            </header>
+
+            <section class="container-picture">
+                <!-- User guide for using the page -->
+                <h2>طلب ملف</h2>
+                <p>(image.png أو video.mp4 مثل) أدخل اسم الملف واضغط على "طلب" للحصول على المادة المقابلة</p>
+                
+                <!-- Requesting field -->
                 <form action="/request_material" method="get" class="request-form">
-                <label for="file">:اسم الملف</label>
-                <input type="text" id="file" name="file" required placeholder="أدخل اسم الملف هنا">
-                <button type="submit">طلب</button>
-            </form>
-        </section>
+                    <label for="file">:اسم الملف</label>
+                    <!-- Allowing users to input data -->
+                    <input type="text" id="file" name="file" required placeholder="أدخل اسم الملف هنا">
+                    
+                    <!-- Button to submit file request -->
+                    <button type="submit">طلب</button>
+                </form>
+            </section>
 
-        <footer class="footer_ar">
-            <div class="links-footer-ar">
-                <p><a href="../html/main_ar.html">العودة إلى الصفحة الرئيسية</a></p>
-            </div>
-        </footer>
-    </div>
-</body>
+            <!-- Footer providing link to main page -->
+            <footer class="footer_ar">
+                <div class="links-footer-ar">
+                    <p><a href="../html/main_ar.html">العودة إلى الصفحة الرئيسية</a></p>
+                </div>
+            </footer>
+        </div>
+    </body>
+
 </html>

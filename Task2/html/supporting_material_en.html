@@ -1,33 +1,55 @@
+<!-- 
+ ENCS3320: Computer Networks course project
+ Task 2
+ Partners: 
+           Maysam Habbash 1220075, section: 1
+           Heba Mustafa 1221916, section: 1 -->
+
 <!DOCTYPE html>
+<!-- Language of web page -->
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supporting Material</title>
-    <link rel="stylesheet" href="../css/style_support.css">
-</head>
-<body>
-    <div class="content-wrapper">
-        <header>
-            <h1>Request Supporting Material</h1>
-        </header>
 
-        <section class="container-picture">
-            <h2>Request a File</h2>
-            <p>Enter the name of the file (e.g., image.png or video.mp4) and click on "Request" to get the corresponding material.</p>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Linking the css file for styling the page -->
+        <link rel="stylesheet" href="../css/style_support.css">
+        <!-- Title to be viewed in the browser's tab -->
+        <title>Supporting Material</title>
+    </head>
 
-            <form action="/request_material" method="get" class="request-form">
-                <label for="file">File Name:</label>
-                <input type="text" id="file" name="file" required placeholder="Enter file name here">
-                <button type="submit">Request</button>
-            </form>
-        </section>
+    <body>
 
-        <footer class="footer_en">
-            <div class="links-footer-en">
-                <p><a href="../html/main_en.html">Return to Main Page</a></p>
-            </div>
-        </footer>
-    </div>
-</body>
+        <div class="content-wrapper">
+            <header>
+                <!-- Main header in page -->
+                <h1>Request Supporting Material</h1>
+            </header>
+
+            <section class="container-picture">
+                <!-- User guide for using the page -->
+                <h2>Request a File</h2>
+                <p>Enter the name of the file (e.g., image.png or video.mp4) and click on "Request" to get the corresponding material.</p>
+
+                <!-- Requesting field -->
+                <form action="/request_material" method="get" class="request-form">
+                    <label for="file">File Name:</label>
+                    <!-- Allowing users to input data -->
+                    <input type="text" id="file" name="file" required placeholder="Enter file name here">
+
+                    <!-- Button to submit file request -->
+                    <button type="submit">Request</button>
+                </form>
+            </section>
+
+            <!-- Footer providing link to main page -->
+            <footer class="footer_en">
+                <div class="links-footer-en">
+                    <p><a href="../html/main_en.html">Return to Main Page</a></p>
+                </div>
+            </footer>
+        </div>
+
+    </body>
+
 </html>
