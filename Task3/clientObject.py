@@ -10,3 +10,4 @@ class ClientObject:
     self.hasAnswered = False
     self.isCorrect = False
     self.roundsWon = 0
+    self.isActive = False

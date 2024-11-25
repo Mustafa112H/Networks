@@ -84,8 +84,11 @@ def collectAnswers(question, startTime):
         if answersQueue.qsize() > 0:
             # retrieve answers in order
             address, answer = answersQueue.get()
+            # Acknowledge active clients
             for client in activeClients:
                 if client.address == address:
+                    # Mark client as active
+                    client.isActive = True
                     # determine correctness of the answer
                     status = "Incorrect!"
                     if answer.lower() == question['answer'].lower():
@@ -135,11 +138,12 @@ def startRound():
             winner = client
 
         # disconnect inactive clients
-        if client.score == 0:
+        if not client.isActive:
             serverSocket.sendto("The game has ended".encode(), client.address)
             activeClients.remove(client)
-        # reset score
+        # reset score and active state
         client.score = 0
+        client.isActive = False
     broadcastMessage(f"The winner is {winner.name} with {winner.roundsWon} rounds! Congratulations!")
 
 # Function to start the game
@@ -213,7 +217,6 @@ def main():
     # Creating a parent thread to handle clients while the game is on
     parentThread = threading.Thread(target=listenForClients, daemon=True)
     parentThread.start()
-    # listenForClients()
 
     # Main loop to start the game
     while True:
