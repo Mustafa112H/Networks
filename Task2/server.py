@@ -139,7 +139,7 @@ while True:
             file_name = query.split("=")[1]
             materialreq(file_name, client_socket)
         else:
-            #Serve the file (or handle error if not found)
+            #Open the file
             response = openfile(requested,client_address)               
             client_socket.sendall(response)              
     
